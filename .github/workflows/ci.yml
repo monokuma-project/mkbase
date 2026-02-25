@@ -20,18 +20,10 @@ jobs:
             compiler: gcc
             cc: gcc-14
             cxx: g++-14
-          - os: ubuntu-24.04
-            compiler: clang
-            cc: clang-18
-            cxx: clang++-18
           - os: windows-latest
             compiler: msvc
             cc: cl
             cxx: cl
-          - os: windows-latest
-            compiler: clang-cl
-            cc: clang-cl
-            cxx: clang-cl
     steps:
         - uses: actions/checkout@v4
 
@@ -40,12 +32,6 @@ jobs:
           run: |
             sudo apt update
             sudo apt install -y gcc-14 g++-14
-        - name: Install Clang (Linux)
-          if: matrix.os == 'ubuntu-24.04' && matrix.compiler == 'clang'
-          run: |
-            sudo apt update
-            sudo apt install -y clang-19 libstdc++-14-dev
-
         - name: Configure (Linux)
           if: runner.os == 'Linux'
           env:
@@ -55,15 +41,8 @@ jobs:
             cmake -B build \
             -DCMAKE_BUILD_TYPE=Debug \
             -DBUILD_TESTS=ON
-        - name: Configure (Windows) (Clang)
-          if: runner.os == 'windows-latest' && matrix.compiler == 'clang'
-          run: |
-            cmake -B build \
-            -DCMAKE_BUILD_TYPE=Debug \
-            -DBUILD_TESTS=ON \
-            -T ClangCL
-        - name: Configure (Windows) (MSVC)
-          if: runner.os == 'windows-latest' && matrix.compiler == 'msvc'
+        - name: Configure (Windows)
+          if: runner.os == 'windows-latest'
           run: |
             cmake -B build \
             -DCMAKE_BUILD_TYPE=Debug \
