@@ -8,14 +8,14 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(Catch2)
 
 add_executable(mkbase_tests
-        "bytesarray/read.cpp"
-        "bytesarray/write.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/bytesarray/read.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/bytesarray/write.cpp"
 
-        "bytestream/read.cpp"
-        "bytestream/write.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/bytestream/read.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/bytestream/write.cpp"
 
-        "int_operations/merge.cpp"
-        "int_operations/separate.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/int_operations/merge.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/int_operations/separate.cpp"
 )
 
 target_link_libraries(mkbase_tests

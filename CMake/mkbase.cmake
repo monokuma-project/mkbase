@@ -8,7 +8,7 @@ else ()
 endif ()
 
 target_include_directories(mkbase
-        PUBLIC "${CMAKE_SOURCE_DIR}/src"
+        PUBLIC "${CMAKE_CURRENT_LIST_DIR}/../src"
 )
 
 if (MKBASE_ERROR_AUTOTELL)
@@ -18,11 +18,11 @@ endif ()
 target_compile_definitions(mkbase PRIVATE MKBASE_COMPILATION)
 
 file(GLOB MKBASE_SOURCES
-        "${CMAKE_SOURCE_DIR}/src/mkbase/byteio/*.cpp"
-        "${CMAKE_SOURCE_DIR}/src/mkbase/byteio/bytesarray/*.cpp"
-        "${CMAKE_SOURCE_DIR}/src/mkbase/byteio/bytestream/*.cpp"
-        "${CMAKE_SOURCE_DIR}/src/mkbase/byteio/filestream/*.cpp"
-        "${CMAKE_SOURCE_DIR}/src/mkbase/logging/*.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/../src/mkbase/byteio/*.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/../src/mkbase/byteio/bytesarray/*.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/../src/mkbase/byteio/bytestream/*.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/../src/mkbase/byteio/filestream/*.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/../src/mkbase/logging/*.cpp"
 )
 
 target_sources(mkbase PRIVATE ${MKBASE_SOURCES})

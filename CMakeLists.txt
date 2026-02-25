@@ -18,4 +18,4 @@ if (BUILD_TESTS)
     add_subdirectory("tests")
 endif ()
 
-include("CMake/mkbase.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/CMake/mkbase.cmake")
