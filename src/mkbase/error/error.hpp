@@ -54,12 +54,6 @@ namespace monokuma::error {
             tell(*this);
         }
 
-        Error(const std::ios_base::failure& ios_error) {
-            this->message_ = "std::ios_base::failure: ";
-            this->message_.append(ios_error.what());
-            tell(*this);
-        }
-
         Error& operator+=(const Error& other) {
             this->message_.append(" && "); this->message_.append(other.message_);
             tell(*this);
