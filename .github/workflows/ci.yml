@@ -36,8 +36,7 @@ jobs:
           env:
             CC: ${{ matrix.cc }}
             CXX: ${{ matrix.cxx }}
-          run: |
-            cmake -B build -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON
+          run: cmake -B build -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON
         - name: Build
           run: cmake --build build --config Debug --parallel
         - name: Test
