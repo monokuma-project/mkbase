@@ -24,5 +24,4 @@ target_link_libraries(mkbase_tests
         PRIVATE mkbase
 )
 
-include("Catch")
-catch_discover_tests(mkbase_tests)
+list(APPEND CATCH_TEST_TARGETS mkbase_tests)
