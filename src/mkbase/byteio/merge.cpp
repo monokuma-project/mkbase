@@ -3,10 +3,10 @@
 #include <bit>
 
 monokuma::byteio::i32 monokuma::byteio::merge_bytes_to_i32(const std::array<byte, 4> &bytes) {
-    auto result = (static_cast<byte_view>(bytes[0]).to_ulong() << 24)
-    | (static_cast<byte_view>(bytes[1]).to_ulong() << 16)
-    | (static_cast<byte_view>(bytes[2]).to_ulong() << 8)
-    | (static_cast<byte_view>(bytes[3]).to_ulong());
+    auto result = (static_cast<i32>(bytes[0]) << 24)
+    | (static_cast<i32>(bytes[1]) << 16)
+    | (static_cast<i32>(bytes[2]) << 8)
+    | (static_cast<i32>(bytes[3]));
 
     if constexpr (std::endian::native == std::endian::little)
         return static_cast<i32>(std::byteswap(result));
