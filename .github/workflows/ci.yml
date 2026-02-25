@@ -32,17 +32,10 @@ jobs:
           run: |
             sudo apt update
             sudo apt install -y gcc-14 g++-14
-        - name: Configure (Linux)
-          if: runner.os == 'Linux'
+        - name: Configure
           env:
             CC: ${{ matrix.cc }}
             CXX: ${{ matrix.cxx }}
-          run: |
-            cmake -B build \
-            -DCMAKE_BUILD_TYPE=Debug \
-            -DBUILD_TESTS=ON
-        - name: Configure (Windows)
-          if: runner.os == 'windows-latest'
           run: |
             cmake -B build \
             -DCMAKE_BUILD_TYPE=Debug \
