@@ -45,8 +45,13 @@ jobs:
           run: cmake --build build --config Debug --parallel
         - name: Test
           run: ctest --test-dir build -C Debug --output-on-failure --parallel 4
-        - name: Publish test results
+        - name: Publish test results (Linux)
           uses: EnricoMi/publish-unit-test-result-action@v2
-          if: always()
+          if: always() && runner.os == 'Linux'
+          with:
+            files: build/**/*_results.xml
+        - name: Publish test results (Windows)
+          uses: EnricoMi/publish-unit-test-result-action/windows@v2
+          if: always() && runnner.os != 'Linux'
           with:
             files: build/**/*_results.xml
