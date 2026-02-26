@@ -1,5 +1,9 @@
 name: CI
 
+permissions:
+  checks: write
+  pull-requests: write
+
 on:
   push:
     branches: [ main, unstable ]
@@ -41,3 +45,8 @@ jobs:
           run: cmake --build build --config Debug --parallel
         - name: Test
           run: ctest --test-dir build -C Debug --output-on-failure --parallel 4
+        - name: Publish test results
+          uses: EnricoMi/publish-unit-test-result-action@v2
+          if: always()
+          with:
+            files: build/**/*_results.xml
