@@ -18,11 +18,11 @@ namespace monokuma::byteio {
 
     template <is_byte_stream_source_provider SourceProviderT> class MKBASE_API ByteStream {
         SourceProviderT source_provider_;
-        std::size_t offset_ = 0;
     public:
         ByteStream(SourceProviderT&& source_provider) : source_provider_(std::move(source_provider)) {}
 
         ByteStream& offset(const std::size_t& new_offset) { this->source_provider_.set_position(new_offset); return *this; }
+        std::size_t get_offset() const { return this->source_provider_.get_position(); }
 
         std::optional<error::Error> write_byte(const byte& byte) {
             if (auto result = this->source_provider_.write_byte(byte); result)
