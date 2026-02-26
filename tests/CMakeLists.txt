@@ -25,3 +25,7 @@ target_link_libraries(mkbase_tests
 )
 
 list(APPEND CATCH_TEST_TARGETS mkbase_tests)
+add_test(
+        NAME mkbase_tests
+        COMMAND mkbase_tests --reporter junit --out mkbase_tests_results.xml
+)
