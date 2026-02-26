@@ -21,6 +21,7 @@ namespace monokuma::byteio {
 
         std::expected<byte, error::Error> read_byte();
 
+        std::size_t get_position() const { return this->reader_position_; }
         BytesArray& set_position(const std::size_t& new_position) { this->reader_position_ = new_position; return *this; }
 
         std::optional<error::Error> write_byte(const byte& byte);
