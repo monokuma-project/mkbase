@@ -3,77 +3,59 @@
 #include <array>
 #include <expected>
 #include <optional>
+#include <vector>
 
 #include "mkbase/api.hpp"
 #include "mkbase/error/error.hpp"
-#include "mkbase/byteio/int_operations.hpp"
 #include "mkbase/byteio/types.hpp"
 
 namespace monokuma::byteio {
-    namespace impl {
-        template <class> struct MKBASE_API is_byte_stream_source_provider : std::false_type {};
-    }
+    class MKBASE_API ByteStream {
+        std::vector<byte> bytes_;
+        std::size_t offset_;
 
-    template <class T> concept is_byte_stream_source_provider = impl::is_byte_stream_source_provider<T>::value;
-
-    template <is_byte_stream_source_provider SourceProviderT> class MKBASE_API ByteStream {
-        SourceProviderT source_provider_;
+        bool is_empty_position(const std::size_t& position) {
+            return this->bytes_.empty() || position >= this->bytes_.size();
+        }
     public:
-        ByteStream(SourceProviderT&& source_provider) : source_provider_(std::move(source_provider)) {}
+        ByteStream(std::vector<byte>&& bytes, std::size_t offset = 0) : bytes_(std::move(bytes)), offset_(offset) {}
+        ByteStream(std::vector<byte>& bytes, std::size_t offset = 0) : bytes_(bytes), offset_(offset) {}
+        ByteStream(std::size_t offset = 0) : offset_(offset) {}
 
-        ByteStream& offset(const std::size_t& new_offset) { this->source_provider_.set_position(new_offset); return *this; }
-        std::size_t get_offset() const { return this->source_provider_.get_position(); }
-
-        std::optional<error::Error> write_byte(const byte& byte) {
-            if (auto result = this->source_provider_.write_byte(byte); result)
-                return error::Error(std::runtime_error("Failed to write byte:")) + result.value();
-            return std::nullopt;
-        }
-
-        std::optional<error::Error> write_int32(const i32& value) {
-            auto bytes = separate_i32_to_bytes(value);
-            for (const auto& byte : bytes)
-                if (auto result = this->write_byte(byte); result)
-                    return error::Error(std::runtime_error("Failed to write int32:")) + result.value();
-            return std::nullopt;
-        }
-
-        std::optional<error::Error> write_int64(const i64& value) {
-            auto bytes = separate_i64_to_bytes(value);
-            for (const auto& byte : bytes)
-                if (auto result = this->write_byte(byte); result)
-                    return error::Error(std::runtime_error("Failed to write int64:")) + result.value();
-            return std::nullopt;
-        }
-
-
-        std::expected<byte, error::Error> read_byte() {
-            if (auto result = this->source_provider_.read_byte(); !result)
-                return std::unexpected(error::Error(std::runtime_error("Failed to read byte: ")) + result.error());
-            else return result.value();
-        }
-
-        std::expected<i32, error::Error> read_int32() {
-            std::array<byte, 4> bytes_buf{};
-            for (std::size_t i = 0; i < 4; ++i) {
-                if (auto result = this->read_byte(); !result)
-                    return std::unexpected(error::Error(std::runtime_error("Failed to read int32:")) + result.error());
-                else bytes_buf[i] = result.value();
+        template <class T> std::optional<error::Error> write(const T& value) {
+            static_assert(std::is_trivially_copyable_v<T>, "Type is not trivially copyable");
+            const byte* value_bytes = reinterpret_cast<const byte*>(&value);
+            for (std::size_t i = 0; i < sizeof(T); ++i) {
+                if (this->is_empty_position(this->offset_++))
+                    this->bytes_.push_back(value_bytes[i]);
+                else {
+                    try { this->bytes_.at(this->offset_++) = value_bytes[i]; }
+                    catch (const std::exception& error) {
+                        return MKERRORE(std::runtime_error("[" + std::to_string(i) + "]: Failed to write byte:"), error);
+                    }
+                }
             }
-            return merge_bytes_to_i32(bytes_buf);
+            return std::nullopt;
         }
 
-        std::expected<i64, error::Error> read_int64() {
-            std::array<byte, 8> bytes_buf{};
-            for (std::size_t i = 0; i < 8; ++i) {
-                if (auto result = this->read_byte(); !result)
-                    return std::unexpected(error::Error(std::runtime_error("Failed to read int64:")) + result.error());
-                else bytes_buf[i] = result.value();
+        template <class AsT> std::optional<error::Error> read(AsT* buffer) {
+            if (this->offset_ + sizeof(AsT) - 1 >= this->bytes_.size())
+                return MKERROR(std::out_of_range("Failed to read: out_of_range"));
+            auto* buffer_bytes = reinterpret_cast<byte*>(buffer);
+            for (std::size_t i = 0; i < sizeof(AsT); ++i) {
+                try { buffer_bytes[i] = this->bytes_.at(this->offset_++); }
+                catch (const std::exception& error) {
+                    return MKERRORE(std::runtime_error("[" + std::to_string(i) + "]: Failed to read byte:"), error);
+                }
             }
-            return merge_bytes_to_i64(bytes_buf);
+            return std::nullopt;
         }
 
+        [[nodiscard]] std::size_t offset() const { return this->offset_; }
+        ByteStream& offset(std::size_t new_offset) { this->offset_ = new_offset; return *this; }
+        [[nodiscard]] std::size_t size() const { return this->bytes_.size(); }
+        [[nodiscard]] std::size_t remaining() const { return this->bytes_.size() - this->offset_; }
 
-        SourceProviderT& source_provider() { return source_provider_; }
+        [[nodiscard]] const std::vector<byte>& bytes() const { return this->bytes_; }
     };
 }
