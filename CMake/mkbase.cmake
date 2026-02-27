@@ -12,7 +12,7 @@ target_include_directories(mkbase
 )
 
 if (MKBASE_ERROR_AUTOTELL)
-    target_compile_definitions(mkbase PRIVATE ERROR_AUTO_TELLING)
+    target_compile_definitions(mkbase PUBLIC ERROR_AUTO_TELLING)
 endif ()
 
 target_compile_definitions(mkbase PRIVATE MKBASE_COMPILATION)
