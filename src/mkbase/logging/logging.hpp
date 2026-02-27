@@ -27,8 +27,7 @@ namespace monokuma::logging {
             std::lock_guard lock(sync);
 
             auto time_t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-            std::tm* tm = nullptr;
-            localtime_s(tm, &time_t);
+            auto* tm = std::localtime(&time_t);
 
             output << "[ " << std::put_time(tm, "%d.%m.%Y %H:%M:%S") << " ] ";
             output << "[ " << logger_name << " ] ";
@@ -45,7 +44,7 @@ namespace monokuma::logging {
             output.flush();
         }
     public:
-        DefaultColorLogger(const char* logger_name, const LogLevel& max_log_level, std::ostream& out, bool use_ansi_colors = true)
+        DefaultColorLogger(const char* logger_name, LogLevel max_log_level, std::ostream& out, bool use_ansi_colors = true)
         : self_name_(logger_name), out_(out), max_log_level_(max_log_level), use_ansi_colors_(use_ansi_colors) {}
 
         void set_max_log_level(const LogLevel& new_max_log_level) { this->max_log_level_ = new_max_log_level; }
