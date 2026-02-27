@@ -3,6 +3,9 @@
 #include <system_error>
 #include <stdexcept>
 #include <string>
+#include <typeinfo>
+
+#include "mkbase/api.hpp"
 
 #ifdef ERROR_AUTO_TELLING
 #include <iostream>
@@ -10,12 +13,11 @@
 #endif
 
 #define FILENAME (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
-#define MK_TELL_ERROR(logger, error_obj) { auto __file_name = FILENAME; auto __line = __LINE__; logger.error("At {}:{} ==> \"{}\"", __file_name, __line, error_obj.what()); }
 
 namespace monokuma::error {
     template <class T> concept has_exception_api = requires(const T& object) { { object.what() } -> std::same_as<const char*>; };
 
-    class Error {
+    class MKBASE_API Error {
         std::string message_;
 
     public:
@@ -70,14 +72,24 @@ namespace monokuma::error {
 }
 
 #ifdef ERROR_AUTO_TELLING
-#define MKERROR(error_constructor_args) ([&]() {\
+#define MKERRORE(error_constructor_args, raw_exception) ([&]() {\
         auto __filename = FILENAME; \
         auto __line = __LINE__; \
         auto __logger = monokuma::logging::DefaultColorLogger("Monokuma::ErrorTelling", monokuma::logging::ERROR, std::cout); \
-        auto __error = monokuma::error::Error(error_constructor_args); \
+        auto __error = monokuma::error::Error(error_constructor_args) + raw_exception; \
         __logger.error("At {}:{} ==> {}", __filename, __line, __error.what()); \
         return __error; \
     }())
+
+#define MKERROR(error_constructor_args) ([&]() {\
+auto __filename = FILENAME; \
+auto __line = __LINE__; \
+auto __logger = monokuma::logging::DefaultColorLogger("Monokuma::ErrorTelling", monokuma::logging::ERROR, std::cout); \
+auto __error = monokuma::error::Error(error_constructor_args); \
+__logger.error("At {}:{} ==> {}", __filename, __line, __error.what()); \
+return __error; \
+}())
 #else
 #define MKERROR(error_constructor_args) monokuma::error::Error(error_constructor_args)
+#define MKERRORE(error_constructor_args, raw_exception) monokuma::error::Error(error_constructor_args) + raw_exception
 #endif
