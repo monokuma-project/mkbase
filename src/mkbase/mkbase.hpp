@@ -10,5 +10,6 @@
 #pragma once
 
 #include "mkbase/byteio/byteio.hpp"
-#include "error/error.hpp"
-#include "logging/logging.hpp"
+#include "mkbase/error/error.hpp"
+#include "mkbase/logging/logging.hpp"
+#include "mkbase/sync/fair_mutex.hpp"
