@@ -4,6 +4,7 @@
 #include <format>
 #include <string>
 
+#include "mkbase/api.hpp"
 #include "mkbase/sync/fair_mutex.hpp"
 
 namespace monokuma::logging {
@@ -15,7 +16,7 @@ namespace monokuma::logging {
         DEBUG = 4,
     };
 
-    class DefaultColorLogger {
+    class MKBASE_API DefaultColorLogger {
         std::string self_name_;
         std::ostream& out_;
         sync::fair::mutex sync_;
@@ -26,10 +27,9 @@ namespace monokuma::logging {
             const std::string& logging_level_str, const std::string& fmt_str, const std::format_args& fmt_args) {
             std::lock_guard lock(sync);
 
-            auto time_t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-            auto* tm = std::localtime(&time_t);
+            auto local_time = std::chrono::zoned_time(std::chrono::current_zone(), std::chrono::system_clock::now());
 
-            output << "[ " << std::put_time(tm, "%d.%m.%Y %H:%M:%S") << " ] ";
+            output << "[ " << std::format("{:%Y-%m-%d %H:%M:%S %Z}", local_time) << " ] ";
             output << "[ " << logger_name << " ] ";
             output << "[ " << logging_level_str << " ] ";
 
