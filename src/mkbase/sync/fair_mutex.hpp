@@ -3,8 +3,10 @@
 #include <condition_variable>
 #include <mutex>
 
+#include "mkbase/api.hpp"
+
 namespace monokuma::sync::fair {
-    class mutex {
+    class MKBASE_API mutex {
         std::mutex sync_;
         std::condition_variable cv_;
         std::size_t current_ = 0, next_ = 0;
