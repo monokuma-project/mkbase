@@ -1,6 +1,5 @@
 #pragma once
 
-#include <array>
 #include <expected>
 #include <optional>
 #include <vector>
@@ -23,13 +22,14 @@ namespace monokuma::byteio {
         ByteStream(std::size_t offset = 0) : offset_(offset) {}
 
         template <class T> std::optional<error::Error> write(const T& value) {
-            static_assert(std::is_trivially_copyable_v<T>, "Type is not trivially copyable");
-            const byte* value_bytes = reinterpret_cast<const byte*>(&value);
+            static_assert(std::is_trivially_copyable_v<T>, "Supported only trivially copyable types");
+
+            const byte* data = reinterpret_cast<const byte*>(&value);
             for (std::size_t i = 0; i < sizeof(T); ++i) {
                 if (this->is_empty_position(this->offset_++))
-                    this->bytes_.push_back(value_bytes[i]);
+                    this->bytes_.push_back(data[i]);
                 else {
-                    try { this->bytes_.at(this->offset_) = value_bytes[i]; }
+                    try { this->bytes_.at(this->offset_) = data[i]; }
                     catch (const std::exception& error) {
                         return MKERRORE(std::runtime_error("[" + std::to_string(i) + "]: Failed to write byte:"), error);
                     }
@@ -52,10 +52,10 @@ namespace monokuma::byteio {
         }
 
         [[nodiscard]] std::size_t offset() const { return this->offset_; }
-        ByteStream& offset(std::size_t new_offset) { this->offset_ = new_offset; return *this; }
+        ByteStream& offset(const std::size_t& new_offset) { this->offset_ = new_offset; return *this; }
         [[nodiscard]] std::size_t size() const { return this->bytes_.size(); }
         [[nodiscard]] std::size_t remaining() const { return this->bytes_.size() - this->offset_; }
 
-        [[nodiscard]] const std::vector<byte>& bytes() const { return this->bytes_; }
+        std::vector<byte>& bytes() { return this->bytes_; }
     };
 }
