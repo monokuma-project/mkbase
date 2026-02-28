@@ -52,6 +52,13 @@ namespace monokuma::byteio {
             return std::nullopt;
         }
 
+        std::optional<error::Error> read(byte* ptr, const std::size_t& size) {
+            this->stream_.read(reinterpret_cast<char*>(ptr), size);
+            if (this->stream_.gcount() != size)
+                return MKERROR(std::runtime_error("Faled to read: gcount less than type size"));
+            return std::nullopt;
+        }
+
         template <class AsT> std::expected<AsT, error::Error> read() {
             AsT buffer;
             if (auto read_result = this->read(buffer); read_result)
