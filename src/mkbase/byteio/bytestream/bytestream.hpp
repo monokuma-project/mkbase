@@ -29,7 +29,7 @@ namespace monokuma::byteio {
                 if (this->is_empty_position(this->offset_++))
                     this->bytes_.push_back(value_bytes[i]);
                 else {
-                    try { this->bytes_.at(this->offset_++) = value_bytes[i]; }
+                    try { this->bytes_.at(this->offset_) = value_bytes[i]; }
                     catch (const std::exception& error) {
                         return MKERRORE(std::runtime_error("[" + std::to_string(i) + "]: Failed to write byte:"), error);
                     }
