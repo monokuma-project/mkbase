@@ -9,6 +9,7 @@ FetchContent_MakeAvailable(Catch2)
 
 add_executable(mkbase_tests
         "${CMAKE_CURRENT_LIST_DIR}/bytestream.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/lazybytestream.cpp"
 )
 
 target_link_libraries(mkbase_tests
